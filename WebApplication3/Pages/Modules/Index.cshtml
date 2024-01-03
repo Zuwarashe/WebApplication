@@ -1,0 +1,111 @@
+﻿@page
+@model WebApplication3.Pages.Modules.IndexModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Here are your modules for the semester:</h1>
+
+<p>
+   Would you like to  <a asp-page="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Module[0].Code)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Module[0].Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Module[0].Weeks)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Module[0].Hours)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Module[0].Credits)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Module) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Code)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Weeks)
+            </td>
+            <td>
+
+                    @((item.Credits * 10)/ item.Weeks)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Credits)
+            </td>
+            <td>
+                    <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-primary">Edit</a> -
+                    <a asp-page="./Details" asp-route-id="@item.Id" class=" btn btn-primary">Add Hours</a> -
+                    <a asp-page="./Delete" asp-route-id="@item.Id" class="btn btn-primary">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Collect module data from the table rows
+        var moduleData = [];
+        var tableRows = document.querySelectorAll('table tbody tr');
+        tableRows.forEach(function (row) {
+            var rowData = {
+                Name: row.cells[1].innerText, // Assuming Name is in the second cell
+                Hours: parseFloat(row.cells[3].innerText) // Assuming Hours is in the fourth cell
+            };
+            moduleData.push(rowData);
+        });
+
+        // Prepare data for the chart
+        var labels = moduleData.map(function (module) {
+            return module.Name;
+        });
+
+        var hoursData = moduleData.map(function (module) {
+            return module.Hours;
+        });
+
+        // Create a bar chart using Chart.js
+        var ctx = document.getElementById('myChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Hours per Module',
+                    data: hoursData,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+}
+
+<!-- Add a canvas element for the chart -->
+<canvas id="myChart" width="400" height="400"></canvas>
